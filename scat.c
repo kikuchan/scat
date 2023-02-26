@@ -49,8 +49,104 @@ int open_serial(const char *fname, mode_t mode, int com_speed, int com_datasize,
 
 	memset(&newtio, 0, sizeof(newtio)); // clear struct for new port settings
 
-	newtio.c_ospeed = com_speed;
-	newtio.c_ispeed = com_speed;
+	int baud = 0;
+	switch (com_speed) {
+#ifdef B50
+	case 50: baud = B50; break;
+#endif
+#ifdef B75
+	case 75: baud = B75; break;
+#endif
+#ifdef B110
+	case 110: baud = B110; break;
+#endif
+#ifdef B134
+	case 134: baud = B134; break;
+#endif
+#ifdef B150
+	case 150: baud = B150; break;
+#endif
+#ifdef B200
+	case 200: baud = B200; break;
+#endif
+#ifdef B300
+	case 300: baud = B300; break;
+#endif
+#ifdef B600
+	case 600: baud = B600; break;
+#endif
+#ifdef B1200
+	case 1200: baud = B1200; break;
+#endif
+#ifdef B1800
+	case 1800: baud = B1800; break;
+#endif
+#ifdef B2400
+	case 2400: baud = B2400; break;
+#endif
+#ifdef B4800
+	case 4800: baud = B4800; break;
+#endif
+#ifdef B9600
+	case 9600: baud = B9600; break;
+#endif
+#ifdef B19200
+	case 19200: baud = B19200; break;
+#endif
+#ifdef B38400
+	case 38400: baud = B38400; break;
+#endif
+#ifdef B57600
+	case 57600: baud = B57600; break;
+#endif
+#ifdef B115200
+	case 115200: baud = B115200; break;
+#endif
+#ifdef B230400
+	case 230400: baud = B230400; break;
+#endif
+#ifdef B460800
+	case 460800: baud = B460800; break;
+#endif
+#ifdef B500000
+	case 500000: baud = B500000; break;
+#endif
+#ifdef B576000
+	case 576000: baud = B576000; break;
+#endif
+#ifdef B921600
+	case 921600: baud = B921600; break;
+#endif
+#ifdef B1000000
+	case 1000000: baud = B1000000; break;
+#endif
+#ifdef B1152000
+	case 1152000: baud = B1152000; break;
+#endif
+#ifdef B1500000
+	case 1500000: baud = B1500000; break;
+#endif
+#ifdef B2000000
+	case 2000000: baud = B2000000; break;
+#endif
+#ifdef B2500000
+	case 2500000: baud = B2500000; break;
+#endif
+#ifdef B3000000
+	case 3000000: baud = B3000000; break;
+#endif
+#ifdef B3500000
+	case 3500000: baud = B3500000; break;
+#endif
+#ifdef B4000000
+	case 4000000: baud = B4000000; break;
+#endif
+	default:
+		fprintf(stderr, "Unsupported speed.\n");
+		goto err;
+	}
+	newtio.c_ospeed = baud;
+	newtio.c_ispeed = baud;
 	newtio.c_cflag = CREAD;
 	newtio.c_iflag = 0;//IGNPAR;
 	newtio.c_oflag = 0;
@@ -259,13 +355,16 @@ int main(int argc, char *argv[])
 		struct timeval tv;
 		fd_set readfds, writefds;
 
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
 
 		FD_SET(fdin, &readfds);
 		FD_SET(fd, &readfds);
 
-		if (select(FD_SETSIZE, &readfds, &writefds, NULL, &tv) == -1) {
+		if (select(FD_SETSIZE, &readfds, &writefds, NULL, NULL) == -1) {
 			if (errno == EAGAIN) continue;
 			perror("select");
 			return -1;
